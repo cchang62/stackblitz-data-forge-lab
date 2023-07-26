@@ -2,20 +2,37 @@ import 'zone.js/dist/zone';
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { bootstrapApplication } from '@angular/platform-browser';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { DataFrame } from 'data-forge';
 
 @Component({
   selector: 'my-app',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, HttpClientModule],
   template: `
     <h1>Hello from {{name}}!</h1>
     <a target="_blank" href="https://angular.io/start">
       Learn more about Angular 
     </a>
+    <br>
+    <input type="file" class="file-input"
+       (change)="onFileSelected($event)" #fileUpload>
+<!--
+    <div class="file-upload">
+
+      {{fileName || "No file uploaded yet."}}
+
+        <button mat-mini-fab color="primary" class="upload-btn"
+          (click)="fileUpload.click()">
+           <mat-icon>attach_file</mat-icon> 
+        </button>
+    </div>
+    -->
   `,
 })
 export class App {
   name = 'Angular';
+
   public userArray: User[] = [];
   constructor(private http: HttpClient) {
     this.http.get('assets/test.csv', { responseType: 'text' }).subscribe(
@@ -33,6 +50,110 @@ export class App {
         console.log(error);
       }
     );
+  }
+
+  fileName = '';
+
+  // constructor(private http: HttpClient) {}
+
+  onFileSelected(event: any) {
+    // https://web.dev/read-files/
+    const file: File = event.target.files[0];
+
+    if (file) {
+      this.fileName = file.name;
+
+      const formData = new FormData();
+
+      formData.append('file', file);
+      // console.log(formData);
+
+      this.getMetadataForFileList(event.target.files);
+      this.readCSV(file);
+      // const upload$ = this.http.post('/api/thumbnail-upload', formData);
+
+      // upload$.subscribe();
+    }
+  }
+
+  getMetadataForFileList(fileList: any) {
+    for (const file of fileList) {
+      // Not supported in Safari for iOS.
+      const name = file.name ? file.name : 'NOT SUPPORTED';
+      // Not supported in Firefox for Android or Opera for Android.
+      const type = file.type ? file.type : 'NOT SUPPORTED';
+      // Unknown cross-browser support.
+      const size = file.size ? file.size : 'NOT SUPPORTED';
+      console.log({ file, name, type, size });
+    }
+  }
+
+  readCSV(file: any) {
+    // https://stackoverflow.com/questions/30223361/js-filereader-read-csv-from-local-file-jquery-csv
+    // Check if the file is an csv.
+    if (file.type && !file.type.startsWith('text/csv')) {
+      console.log('File is not an csv.', file.type, file);
+      return;
+    }
+    var reader = new FileReader();
+    reader.readAsText(file);
+    let csv: any;
+    reader.onload = function (event) {
+      csv = event.target?.result;
+    };
+    console.log(csv);
+    // this.printCSV(csv); // console.log(csv);
+    reader.onerror = function () {
+      alert('Unable to read ' + file.fileName);
+    };
+  }
+
+  printCSV(csv: any) {
+    console.log(csv);
+  }
+
+  testDataForge() {
+    /*
+    let df = new DataFrame({
+      columns: {
+        regiment: [
+          'Nighthawks',
+          'Nighthawks',
+          'Nighthawks',
+          'Nighthawks',
+          'Dragoons',
+          'Dragoons',
+          'Dragoons',
+          'Dragoons',
+          'Scouts',
+          'Scouts',
+          'Scouts',
+          'Scouts',
+        ],
+        company: [
+          '1st',
+          '1st',
+          '2nd',
+          '2nd',
+          '1st',
+          '1st',
+          '2nd',
+          '2nd',
+          '1st',
+          '1st',
+          '2nd',
+          '2nd',
+        ],
+        TestScore: [4, 24, 31, 2, 3, 4, 24, 31, 2, 3, 2, 3],
+      },
+    });
+    const pivotted = df.pivot(
+      ['regiment', 'company'],
+      'TestScore',
+      (testScores) => testScores.average()
+    );
+    console.log(pivotted.toArray());
+    */
   }
 }
 
@@ -75,45 +196,8 @@ platformBrowserDynamic()
   })
   .catch((err) => console.error(err));
 */
-import { DataFrame } from 'data-forge';
-import { HttpClient } from '@angular/common/http';
-let df = new DataFrame({
-  columns: {
-    regiment: [
-      'Nighthawks',
-      'Nighthawks',
-      'Nighthawks',
-      'Nighthawks',
-      'Dragoons',
-      'Dragoons',
-      'Dragoons',
-      'Dragoons',
-      'Scouts',
-      'Scouts',
-      'Scouts',
-      'Scouts',
-    ],
-    company: [
-      '1st',
-      '1st',
-      '2nd',
-      '2nd',
-      '1st',
-      '1st',
-      '2nd',
-      '2nd',
-      '1st',
-      '1st',
-      '2nd',
-      '2nd',
-    ],
-    TestScore: [4, 24, 31, 2, 3, 4, 24, 31, 2, 3, 2, 3],
-  },
-});
-const pivotted = df.pivot(['regiment', 'company'], 'TestScore', (testScores) =>
-  testScores.average()
-);
-console.log(pivotted.toArray());
+
+// import { HttpClient } from '@angular/common/http';
 
 /*
 // Error in /turbo_modules/apache-arrow@11.0.0/fb/record-batch.js (8:21)
