@@ -30,7 +30,7 @@ import { DataFrame } from 'data-forge';
     -->
   `,
 })
-export class App implements OnInit {
+export class App {
   name = 'Angular';
 
   public userArray: User[] = [];
@@ -52,8 +52,9 @@ export class App implements OnInit {
     );
   }
 
-  public ngOnInit(): void {
-    this.testDataForge;
+  ngOnInit(): void {
+    this.testDataForge();
+    this.whereClauseTest();
   }
 
   fileName = '';
@@ -62,6 +63,7 @@ export class App implements OnInit {
 
   onFileSelected(event: any) {
     // https://web.dev/read-files/
+
     const file: File = event.target.files[0];
 
     if (file) {
@@ -71,13 +73,11 @@ export class App implements OnInit {
 
       formData.append('file', file);
       // console.log(formData);
-
       this.getMetadataForFileList(event.target.files);
       this.readCSV(file);
       // const upload$ = this.http.post('/api/thumbnail-upload', formData);
-
       // upload$.subscribe();
-      this.testDataForge;
+      // this.testDataForge;
     }
   }
 
@@ -93,7 +93,7 @@ export class App implements OnInit {
     }
   }
 
-  readCSV(file: any) {
+  readCSV(file: any): any {
     // https://stackoverflow.com/questions/30223361/js-filereader-read-csv-from-local-file-jquery-csv
     // Check if the file is an csv.
     if (file.type && !file.type.startsWith('text/csv')) {
@@ -105,7 +105,7 @@ export class App implements OnInit {
     // let csv: any;
     reader.onload = function (event) {
       let csv = event.target?.result;
-      console.log(csv);
+      // console.log(csv);
     };
     // console.log(csv);
     // this.printCSV(csv); // console.log(csv);
@@ -157,6 +157,7 @@ export class App implements OnInit {
       'TestScore',
       (testScores) => testScores.average()
     );
+    console.log('=====Call With Column: Pivotted=====');
     console.log(pivotted.toArray());
   }
 
@@ -175,8 +176,10 @@ export class App implements OnInit {
         ['03-04-2023', 'Papayas', 6, 20],
       ],
     });
+    console.log('=====Call With CSV Option: Raw Data=====');
     console.log(dataFrame);
     // Filter data
+    console.log('=====Call With CSV Option: Filtered Data=====');
     const filteredData = dataFrame.where(
       (row) => row.price > 5 && row.product === 'Grapes'
     );
