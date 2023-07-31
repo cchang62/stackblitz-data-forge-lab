@@ -1,5 +1,5 @@
 import 'zone.js/dist/zone';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
@@ -30,7 +30,7 @@ import { DataFrame } from 'data-forge';
     -->
   `,
 })
-export class App {
+export class App implements OnInit {
   name = 'Angular';
 
   public userArray: User[] = [];
@@ -44,12 +44,16 @@ export class App {
             new User(parseInt(row[0], 10), row[1], row[2].trim())
           );
         }
-        console.log(this.userArray);
+        // console.log(this.userArray);
       },
       (error) => {
         console.log(error);
       }
     );
+  }
+
+  public ngOnInit(): void {
+    this.testDataForge;
   }
 
   fileName = '';
@@ -73,6 +77,7 @@ export class App {
       // const upload$ = this.http.post('/api/thumbnail-upload', formData);
 
       // upload$.subscribe();
+      this.testDataForge;
     }
   }
 
@@ -97,11 +102,12 @@ export class App {
     }
     var reader = new FileReader();
     reader.readAsText(file);
-    let csv: any;
+    // let csv: any;
     reader.onload = function (event) {
-      csv = event.target?.result;
+      let csv = event.target?.result;
+      console.log(csv);
     };
-    console.log(csv);
+    // console.log(csv);
     // this.printCSV(csv); // console.log(csv);
     reader.onerror = function () {
       alert('Unable to read ' + file.fileName);
@@ -113,7 +119,6 @@ export class App {
   }
 
   testDataForge() {
-    /*
     let df = new DataFrame({
       columns: {
         regiment: [
@@ -153,7 +158,29 @@ export class App {
       (testScores) => testScores.average()
     );
     console.log(pivotted.toArray());
-    */
+  }
+
+  whereClauseTest() {
+    const dataFrame = new DataFrame({
+      columnNames: ['date', 'product', 'price', 'quantity'],
+      rows: [
+        ['01-03-2023', 'Apples', 3, 10],
+        ['02-03-2023', 'Bananas', 2, 20],
+        ['03-03-2023', 'Oranges', 4, 5],
+        ['05-03-2023', 'Strawberries', 8, 8],
+        ['06-03-2023', 'Blueberries', 7, 12],
+        ['09-03-2023', 'Grapes', 9, 5],
+        ['10-03-2023', 'Kiwis', 8, 15],
+        ['15-03-2023', 'Pineapples', 7, 15],
+        ['03-04-2023', 'Papayas', 6, 20],
+      ],
+    });
+    console.log(dataFrame);
+    // Filter data
+    const filteredData = dataFrame.where(
+      (row) => row.price > 5 && row.product === 'Grapes'
+    );
+    console.log(filteredData);
   }
 }
 
