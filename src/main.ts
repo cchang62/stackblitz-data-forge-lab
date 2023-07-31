@@ -166,24 +166,33 @@ export class App {
       columnNames: ['date', 'product', 'price', 'quantity'],
       rows: [
         ['01-03-2023', 'Apples', 3, 10],
+        ['01-05-2023', 'Apples', 10, 6],
         ['02-03-2023', 'Bananas', 2, 20],
         ['03-03-2023', 'Oranges', 4, 5],
+        ['03-23-2023', 'Oranges', 8, 15],
         ['05-03-2023', 'Strawberries', 8, 8],
         ['06-03-2023', 'Blueberries', 7, 12],
         ['09-03-2023', 'Grapes', 9, 5],
         ['10-03-2023', 'Kiwis', 8, 15],
+        ['10-08-2023', 'Kiwis', 12, 10],
         ['15-03-2023', 'Pineapples', 7, 15],
         ['03-04-2023', 'Papayas', 6, 20],
       ],
     });
+    // Raw data
     console.log('=====Call With CSV Option: Raw Data=====');
     console.log(dataFrame);
     // Filter data
-    console.log('=====Call With CSV Option: Filtered Data=====');
+    console.log('=====Call With CSV Option: Filtered Data: n-cond.=====');
     const filteredData = dataFrame.where(
-      (row) => row.price > 5 && row.product === 'Grapes'
+      (row) => row.price > 6 && row.product === 'Oranges'
     );
     console.log(filteredData);
+    console.log('=====Call With CSV Option: Filtered Data: Where-in=====');
+    const filteredData1 = dataFrame.where((row) =>
+      ['Kiwis', 'Apples'].includes(row.product)
+    );
+    console.log(filteredData1);
   }
 }
 
